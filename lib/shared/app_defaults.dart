@@ -23,3 +23,7 @@ String API_LOGIN = "/access-tokens"; // POST
 String API_LOGOUT = "/access-tokens"; // DELETE
 String API_REFRESH_TOKEN = "/access-tokens/refresh"; // POST
 String API_CURRENT_USER = "/me"; // GET
+String API_IDEA_ADD = "/ideas"; // POST
+String API_IDEA_DELETE = "/ideas/:id"; // DELETE
+String API_IDEA_UPDATE = "/ideas/:id"; // PUT
+String API_IDEAS = "/ideas"; // GET

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_idea_pool/models/idea_repository.dart';
 
 import 'blocs/blocs.dart';
 import 'blocs/simple_bloc_observer.dart';
@@ -17,6 +18,8 @@ Future<void> main() async {
   await _sharedPref.initSharedPreferences();
   final UserRepository _userRepository =
       UserRepository(sharedPref: _sharedPref);
+  final IdeaRepository _ideaRepository =
+      IdeaRepository(userRepository: _userRepository);
 
   runApp(MultiBlocProvider(
     providers: [
@@ -25,7 +28,12 @@ Future<void> main() async {
         create: (context) => AuthBloc(
           userRepository: _userRepository,
         )..add(AppStartedEvent()),
-      )
+      ),
+      BlocProvider<IdeaBloc>(
+          lazy: false,
+          create: (context) => IdeaBloc(
+                ideaRepository: _ideaRepository,
+              )),
     ],
     child: MainApp(
       key: _globalKeyMain,
