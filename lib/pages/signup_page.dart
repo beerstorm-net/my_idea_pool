@@ -116,6 +116,10 @@ class _SignupPageState extends State<SignupPage> {
             if (_signupFormKey.currentState.saveAndValidate()) {
               CommonUtils.logger.d(_signupFormKey.currentState.value);
 
+              BlocProvider.of<AuthBloc>(context).add(WarnUserEvent(
+                  List<String>()..add("progress_start"),
+                  message: ""));
+
               BlocProvider.of<AuthBloc>(buildContext)
                   .add(SignupEvent(_signupFormKey.currentState.value));
             } else {
@@ -124,41 +128,6 @@ class _SignupPageState extends State<SignupPage> {
             }
           },
         ),
-
-        /*Row(
-          children: <Widget>[
-            Expanded(
-              child: MaterialButton(
-                color: Theme.of(context).accentColor,
-                child: Text(
-                  'Submit',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  if (_signupFormKey.currentState.saveAndValidate()) {
-                    CommonUtils.logger.d(_signupFormKey.currentState.value);
-                  } else {
-                    CommonUtils.logger.d(_signupFormKey.currentState.value);
-                    CommonUtils.logger.d('validation failed');
-                  }
-                },
-              ),
-            ),
-            SizedBox(width: 20),
-            Expanded(
-              child: MaterialButton(
-                color: Theme.of(context).accentColor,
-                child: Text(
-                  'Reset',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  _signupFormKey.currentState.reset();
-                },
-              ),
-            ),
-          ],
-        ), */
       ],
     );
   }

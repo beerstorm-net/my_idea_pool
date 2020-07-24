@@ -101,6 +101,10 @@ class _LoginPageState extends State<LoginPage> {
             if (_loginFormKey.currentState.saveAndValidate()) {
               CommonUtils.logger.d(_loginFormKey.currentState.value);
 
+              BlocProvider.of<AuthBloc>(context).add(WarnUserEvent(
+                  List<String>()..add("progress_start"),
+                  message: ""));
+
               BlocProvider.of<AuthBloc>(buildContext)
                   .add(LoginEvent(_loginFormKey.currentState.value));
             } else {

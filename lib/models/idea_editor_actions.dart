@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_idea_pool/blocs/blocs.dart';
-import 'package:my_idea_pool/models/app_idea.dart';
+
+import '../blocs/blocs.dart';
+import '../models/app_idea.dart';
 
 class IdeaEditorActions {
   BuildContext _context;
@@ -35,11 +36,16 @@ class IdeaEditorActions {
     }
   }
 
-  void updateIdea(Map<String, dynamic> formInput) {
-    AppIdea appIdea = _appIdeaFromInput(formInput);
+  void updateIdea(Map<String, dynamic> formInput, {AppIdea appIdea}) {
+    AppIdea appIdeaToUpdate = _appIdeaFromInput(formInput);
 
-    if (appIdea.id != null && appIdea.content != null) {
-      BlocProvider.of<IdeaBloc>(_context).add(UpdateIdeaEvent(appIdea));
+    if (appIdea != null && appIdea.id != null) {
+      // edit existing idea
+      appIdeaToUpdate.id = appIdea.id;
+    }
+
+    if (appIdeaToUpdate != null && appIdeaToUpdate.content != null) {
+      BlocProvider.of<IdeaBloc>(_context).add(UpdateIdeaEvent(appIdeaToUpdate));
     }
   }
 

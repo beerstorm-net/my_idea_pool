@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:my_idea_pool/models/app_idea.dart';
-import 'package:my_idea_pool/shared/common_utils.dart';
+import 'package:my_idea_pool/blocs/auth/auth_bloc.dart';
+import 'package:my_idea_pool/widgets/common_dialogs.dart';
+
+import '../models/app_idea.dart';
+import '../shared/common_utils.dart';
 
 class IdeaEditorPage extends StatefulWidget {
   final Function add;
@@ -31,10 +35,9 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        leading: Icon(
-          Icons.lightbulb_outline,
-          color: Colors.white,
-        ),
+        //leading: appBarLeading()
+        title: appBarLeading(),
+        centerTitle: false,
       ),
       body: Container(
         child: _ideaEditorForm(buildContext),
@@ -69,6 +72,8 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
               FormBuilderTextField(
                 attribute: "content",
                 decoration: InputDecoration(labelText: "Idea"),
+                initialValue:
+                    widget.appIdea != null ? widget.appIdea.content : '',
                 validators: [
                   FormBuilderValidators.required(),
                   FormBuilderValidators.max(255),
@@ -77,7 +82,8 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
               FormBuilderDropdown(
                 attribute: "impact",
                 decoration: InputDecoration(labelText: "Impact"),
-                initialValue: '10',
+                initialValue:
+                    widget.appIdea != null ? widget.appIdea.impact : '10',
                 //validators: [FormBuilderValidators.required()],
                 onChanged: (val) {
                   _ideaEditorFormKey.currentState.save();
@@ -91,7 +97,8 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
               FormBuilderDropdown(
                 attribute: "ease",
                 decoration: InputDecoration(labelText: "Ease"),
-                initialValue: '10',
+                initialValue:
+                    widget.appIdea != null ? widget.appIdea.ease : '10',
                 //validators: [FormBuilderValidators.required()],
                 onChanged: (val) {
                   _ideaEditorFormKey.currentState.save();
@@ -105,7 +112,8 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
               FormBuilderDropdown(
                 attribute: "confidence",
                 decoration: InputDecoration(labelText: "Confidence"),
-                initialValue: '10',
+                initialValue:
+                    widget.appIdea != null ? widget.appIdea.confidence : '10',
                 //validators: [FormBuilderValidators.required()],
                 onChanged: (val) {
                   _ideaEditorFormKey.currentState.save();
@@ -119,7 +127,9 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
               FormBuilderTextField(
                 attribute: "average",
                 decoration: InputDecoration(labelText: "Avg."),
-                initialValue: _average.truncate().toString(),
+                initialValue: widget.appIdea != null
+                    ? widget.appIdea.average_score.toStringAsFixed(1)
+                    : _average.toString(),
                 readOnly: true,
               ),
             ],
@@ -139,7 +149,16 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
             if (_ideaEditorFormKey.currentState.saveAndValidate()) {
               CommonUtils.logger.d(_ideaEditorFormKey.currentState.value);
 
-              widget.add(_ideaEditorFormKey.currentState.value);
+              BlocProvider.of<AuthBloc>(context).add(WarnUserEvent(
+                  List<String>()..add("progress_start"),
+                  message: ""));
+
+              if (widget.update != null && widget.appIdea != null) {
+                widget.update(_ideaEditorFormKey.currentState.value,
+                    appIdea: widget.appIdea);
+              } else {
+                widget.add(_ideaEditorFormKey.currentState.value);
+              }
               Navigator.pop(buildContext);
             } else {
               CommonUtils.logger.d(_ideaEditorFormKey.currentState.value);

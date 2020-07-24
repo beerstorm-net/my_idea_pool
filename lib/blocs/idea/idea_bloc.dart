@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:my_idea_pool/models/app_idea.dart';
-import 'package:my_idea_pool/models/idea_repository.dart';
+
+import '../../models/app_idea.dart';
+import '../../models/idea_repository.dart';
 
 part 'idea_event.dart';
 part 'idea_state.dart';

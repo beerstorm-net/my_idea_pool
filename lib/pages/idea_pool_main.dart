@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_idea_pool/blocs/auth/auth_bloc.dart';
-import 'package:my_idea_pool/blocs/idea/idea_bloc.dart';
-import 'package:my_idea_pool/models/app_idea.dart';
-import 'package:my_idea_pool/models/idea_editor_actions.dart';
-import 'package:my_idea_pool/models/models.dart';
-import 'package:my_idea_pool/shared/common_utils.dart';
+import 'package:my_idea_pool/widgets/common_dialogs.dart';
 
+import '../blocs/auth/auth_bloc.dart';
+import '../blocs/idea/idea_bloc.dart';
+import '../models/app_idea.dart';
+import '../models/idea_editor_actions.dart';
+import '../models/models.dart';
+import '../shared/common_utils.dart';
 import 'idea_editor_page.dart';
 
 class IdeaPoolMain extends StatefulWidget {
@@ -17,15 +18,50 @@ class IdeaPoolMain extends StatefulWidget {
   _IdeaPoolMainState createState() => _IdeaPoolMainState();
 }
 
-class _IdeaPoolMainState extends State<IdeaPoolMain> {
+class _IdeaPoolMainState extends State<IdeaPoolMain>
+    with WidgetsBindingObserver {
   UserRepository _userRepository;
   //IdeaRepository _ideaRepository;
   IdeaEditorActions _ideaEditorActions;
   List<AppIdea> _ideas = List();
   @override
   void initState() {
-    // TODO: implement initState
+    // if necessary, also listen to when first loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _forceReload();
+    });
+
+    // listen to appstates
+    WidgetsBinding.instance.addObserver(this);
+
     super.initState();
+  }
+
+  _forceReload() {
+    BlocProvider.of<AuthBloc>(context)
+        .add(WarnUserEvent(List<String>()..add("progress_start"), message: ""));
+
+    // force load on init
+    BlocProvider.of<AuthBloc>(context).add(RefreshTokenEvent());
+    Future.delayed(Duration(seconds: 1));
+    BlocProvider.of<IdeaBloc>(context).add(LoadIdeasEvent());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _forceReload();
+    } else {
+      // NB! do smt if necessary when app is in the background
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    super.dispose();
   }
 
   @override
@@ -34,31 +70,33 @@ class _IdeaPoolMainState extends State<IdeaPoolMain> {
       _userRepository = RepositoryProvider.of<UserRepository>(buildContext);
       //_ideaRepository = IdeaRepository(userRepository: _userRepository);
       _ideaEditorActions = IdeaEditorActions(context: buildContext);
-
-      // force load on init
-      BlocProvider.of<AuthBloc>(buildContext).add(RefreshTokenEvent());
-      Future.delayed(Duration(seconds: 1));
-      BlocProvider.of<IdeaBloc>(buildContext).add(LoadIdeasEvent());
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'The Idea Pool',
-          style: TextStyle(color: Colors.white),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            appBarLeading(),
+            Text(
+              'The Idea Pool',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
         centerTitle: false,
-        leading: Icon(
-          Icons.lightbulb_outline,
-          color: Colors.white,
-        ),
+        //leading: appBarLeading(),
         backgroundColor: Colors.green,
         actions: <Widget>[
           FlatButton.icon(
             // just for testing
             onPressed: () {
-              //BlocProvider.of<AuthBloc>(buildContext).add(RefreshTokenEvent());
-              //Future.delayed(Duration(seconds: 1));
+              BlocProvider.of<AuthBloc>(context).add(WarnUserEvent(
+                  List<String>()..add("progress_start"),
+                  message: ""));
+              BlocProvider.of<AuthBloc>(buildContext).add(RefreshTokenEvent());
+              Future.delayed(Duration(seconds: 1));
               BlocProvider.of<IdeaBloc>(buildContext).add(LoadIdeasEvent());
             },
             icon: Icon(Icons.refresh),
@@ -99,20 +137,18 @@ class _IdeaPoolMainState extends State<IdeaPoolMain> {
         ),
         tooltip: 'Add new Idea',
       ),
-      /*body: Container(
-          child: Center(
-        child: Text("TODO: Idea Pool main page"),
-      )),*/
       body: BlocListener<IdeaBloc, IdeaState>(
         listenWhen: (prev, current) {
           return current is IdeasLoaded;
         },
         listener: (context, state) {
+          BlocProvider.of<AuthBloc>(context).add(
+              WarnUserEvent(List<String>()..add("progress_stop"), message: ""));
           if (state is IdeasLoaded) {
             setState(() {
               _ideas = state.ideas;
 
-              CommonUtils.logger.d('ideas: $_ideas');
+              CommonUtils.logger.d('ideas: ${_ideas.length}');
             });
           }
         },
@@ -151,38 +187,7 @@ class _IdeaPoolMainState extends State<IdeaPoolMain> {
               onPressed: () {
                 CommonUtils.logger.d('more: $idea');
 
-                final cupertinoAction = CupertinoActionSheet(
-                  message: Text(
-                    "Actions",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  actions: <Widget>[
-                    CupertinoActionSheetAction(
-                      child: Text("Edit"),
-                      isDefaultAction: true,
-                      onPressed: () {
-                        print("EDIT clicked for ${idea.id}");
-                      },
-                    ),
-                    CupertinoActionSheetAction(
-                      child: Text("Delete"),
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        print("DELETE clicked for ${idea.id}");
-                        _ideaEditorActions.deleteIdea(idea);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text("Cancel"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                );
-                showCupertinoModalPopup(
-                    context: context, builder: (context) => cupertinoAction);
+                _showCupertinoAction(idea);
               },
             )
           ],
@@ -216,7 +221,7 @@ class _IdeaPoolMainState extends State<IdeaPoolMain> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text('${idea.average_score}'),
+                Text('${idea.average_score.toStringAsFixed(1)}'),
                 Text('Avg.'),
               ],
             ),
@@ -226,16 +231,96 @@ class _IdeaPoolMainState extends State<IdeaPoolMain> {
     );
   }
 
+  _showCupertinoAction(AppIdea idea) {
+    final cupertinoAction = CupertinoActionSheet(
+      message: Text(
+        "Actions",
+        style: TextStyle(fontSize: 14, color: Colors.grey),
+      ),
+      actions: <Widget>[
+        CupertinoActionSheetAction(
+          child: Text("Edit"),
+          isDefaultAction: true,
+          onPressed: () {
+            CommonUtils.logger.d("EDIT clicked for ${idea.id}");
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute<IdeaEditorPage>(
+                builder: (_) => IdeaEditorPage(
+                  update: _ideaEditorActions.updateIdea,
+                  appIdea: idea,
+                ),
+              ),
+            );
+          },
+        ),
+        CupertinoActionSheetAction(
+          child: Text("Delete"),
+          isDestructiveAction: true,
+          onPressed: () {
+            CommonUtils.logger.d("DELETE clicked for ${idea.id}");
+
+            showCupertinoDialog(
+                context: context,
+                builder: (_) => CupertinoAlertDialog(
+                      title: Text('Are you sure?'),
+                      content: Text('This idea will be permanently deleted'),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          child: Text('Cancel'),
+                          isDefaultAction: true,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        CupertinoDialogAction(
+                          child: Text('OK'),
+                          isDestructiveAction: true,
+                          onPressed: () {
+                            Navigator.pop(context);
+
+                            BlocProvider.of<AuthBloc>(context).add(
+                                WarnUserEvent(
+                                    List<String>()..add("progress_start"),
+                                    message: ""));
+                            _ideaEditorActions.deleteIdea(idea);
+
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ));
+
+            /*
+
+            */
+          },
+        ),
+      ],
+      cancelButton: CupertinoActionSheetAction(
+        child: Text("Cancel"),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+    showCupertinoModalPopup(
+        context: context, builder: (context) => cupertinoAction);
+  }
+
   _emptyIdeasPage() {
     return Container(
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.lightbulb_outline, size: 99, color: Colors.blueGrey),
+          //Icon(Icons.lightbulb_outline, size: 99, color: Colors.blueGrey),
+          appIconImage(color: Colors.black.withOpacity(0.88)),
           Text(
             "Got Ideas?",
-            style: TextStyle(fontSize: 33, color: Colors.blueGrey),
+            style: TextStyle(
+                fontSize: 28, color: Colors.black87.withOpacity(0.66)),
           )
         ],
       ),

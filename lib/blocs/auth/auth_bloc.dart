@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:my_idea_pool/shared/common_utils.dart';
 
 import '../../models/models.dart';
 import '../../shared/app_defaults.dart';
+import '../../shared/common_utils.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -40,6 +40,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield* _mapRefreshTokenEventToState(event);
     } else if (event is CurrentUserEvent) {
       yield* _mapCurrentUserEventToState(event);
+    } else if (event is WarnUserEvent) {
+      yield* _mapWarnUserEventToState(event);
     }
   }
 
@@ -56,7 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield Authenticated(appUser, origin: ORIGIN.SIGNUP);
     } else {
       yield Unauthenticated(
-          detail: Map()..putIfAbsent('message', () => 'API call failed'),
+          detail: Map()..putIfAbsent('message', () => 'Signup failed'),
           origin: ORIGIN.SIGNUP);
     }
   }
@@ -73,8 +75,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield Authenticated(appUser, origin: ORIGIN.LOGIN);
     } else {
       yield Unauthenticated(
-          detail: Map()..putIfAbsent('message', () => 'API call failed'),
+          detail: Map()..putIfAbsent('message', () => 'Login failed'),
           origin: ORIGIN.LOGIN);
+
+      //add(WarnUserEvent(List<String>()..add("error"), message: "LOGIN failed"));
     }
   }
 
@@ -130,5 +134,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (_) {
       yield Unauthenticated(); //(origin: ORIGIN.RELOAD);
     }
+  }
+
+  Stream<AuthState> _mapWarnUserEventToState(WarnUserEvent event) async* {
+    // TODO implement this further if necessary
+    yield WarnUserState(event.actions, message: event.message);
   }
 }

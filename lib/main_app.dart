@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_idea_pool/pages/idea_pool_main.dart';
-import 'package:my_idea_pool/pages/login_signup.dart';
-import 'package:my_idea_pool/shared/common_utils.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_idea_pool/pages/main_page.dart';
 
-import 'blocs/auth/auth_bloc.dart';
 import 'models/user_repository.dart';
 
 class MainApp extends StatefulWidget {
@@ -27,21 +24,25 @@ class _MainAppState extends State<MainApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: _navigatorKey,
+      localizationsDelegates: [
+        // Built-in localization of basic text for Material widgets
+        GlobalMaterialLocalizations.delegate,
+        // Built-in localization for text direction LTR/RTL
+        GlobalWidgetsLocalizations.delegate,
+        // Built-in localization of basic text for Cupertino widgets
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en'),
+      ],
+      localeResolutionCallback:
+          (Locale locale, Iterable<Locale> supportedLocales) {
+        return locale;
+      },
       title: 'My Idea Pool',
-      home: BlocBuilder<AuthBloc, AuthState>(buildWhen: (prev, current) {
-        return (current is AuthState &&
-            (current is Authenticated || current is Unauthenticated));
-      }, builder: (context, state) {
-        CommonUtils.logger.d("main.builder state: $state");
-
-        return Center(
-          child: RepositoryProvider(
-            lazy: false,
-            create: (buildContext) => widget.userRepository,
-            child: (state is Authenticated) ? IdeaPoolMain() : LoginSignup(),
-          ),
-        );
-      }),
+      home: MainPage(
+        userRepository: widget.userRepository,
+      ),
     );
   }
 }

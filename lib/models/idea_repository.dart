@@ -3,11 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:my_idea_pool/shared/common_utils.dart';
 
 import '../models/app_idea.dart';
 import '../models/user_repository.dart';
 import '../shared/app_defaults.dart';
+import '../shared/common_utils.dart';
 import 'app_user.dart';
 
 class IdeaRepository {
@@ -106,9 +106,9 @@ class IdeaRepository {
     final response =
         await http.delete(reqUrl, headers: {API_HEADER_TOKEN: appUser.token});
 
-    if (response.statusCode <= 201) {
-      Map<String, dynamic> responseJson = json.decode(response.body);
-      CommonUtils.logger.d('deleteIdea: $responseJson');
+    if (response.statusCode <= 204) {
+      //Map<String, dynamic> responseJson = json.decode(response.body);
+      CommonUtils.logger.d('OK deleteIdea: ${appIdea.id}');
     } else {
       CommonUtils.logger
           .e('API call failed... $reqUrl | ${response.reasonPhrase}');

@@ -39,3 +39,16 @@ class LogoutEvent extends AuthEvent {}
 class RefreshTokenEvent extends AuthEvent {}
 
 class CurrentUserEvent extends AuthEvent {}
+
+class WarnUserEvent extends AuthEvent {
+  final List<String> actions;
+  final String message;
+
+  const WarnUserEvent(this.actions, {this.message});
+
+  @override
+  List<Object> get props => [actions, message];
+
+  @override
+  String toString() => 'WarnUserEvent { actions: $actions, message: $message }';
+}

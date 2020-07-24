@@ -44,3 +44,16 @@ class Authenticated extends AuthState {
   String toString() =>
       'Authenticated { appUser: ${appUser.toJson().toString()} | origin: $origin}';
 }
+
+class WarnUserState extends AuthState {
+  final List<String> actions;
+  final String message;
+
+  const WarnUserState(this.actions, {this.message});
+
+  @override
+  List<Object> get props => [actions, message];
+
+  @override
+  String toString() => 'WarnUserState { actions: $actions, message: $message }';
+}
