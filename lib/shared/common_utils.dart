@@ -1,8 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:logger/logger.dart';
+import 'package:my_idea_pool/blocs/auth/auth_bloc.dart';
+import 'package:my_idea_pool/models/app_user.dart';
 import 'package:uuid/uuid.dart';
 
 class CommonUtils {
@@ -44,5 +48,22 @@ class CommonUtils {
     return rootBundle
         .loadString(filePath)
         .then((jsonStr) => jsonDecode(jsonStr));
+  }
+
+  static bool shouldRefreshToken(String dateAt) {
+    // API token expires in 10mins, refresh earlier to avoid expiration!
+    if (dateAt != null && dateAt.isNotEmpty) {
+      Jiffy jiffy = Jiffy(dateAt);
+      return (jiffy.diff(DateTime.now(), Units.MINUTE) >= 5);
+    }
+    return true;
+  }
+
+  static void checkRefreshToken(context, AppUser appUser) {
+    if (CommonUtils.shouldRefreshToken(appUser?.token_updated_at)) {
+      BlocProvider.of<AuthBloc>(context)
+          .add(RefreshTokenEvent(appUser: appUser));
+    }
+    Future.delayed(Duration(seconds: 1));
   }
 }

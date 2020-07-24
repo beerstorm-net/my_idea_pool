@@ -1,0 +1,58 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+
+  # slack_url comes from .env file
+
+  app_name = "myIdeaPool"
+  version = get_version_number
+  slack_message = "*#{app_name} #{version}* as new version successfully submitted to TestFlight!"
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+
+    build_app(workspace: "Runner.xcworkspace", scheme: "Runner")
+    upload_to_testflight
+
+    clean_build_artifacts
+
+    slack(
+        message: slack_message,
+        slack_url: ENV["slack_url"]
+    )
+  end
+
+  desc "Test message to slack"
+  lane :toSlack do
+    # https://docs.fastlane.tools/actions/slack/
+    slack(
+        message: "*#{version}* for testing slack notification!",
+        slack_url: ENV["slack_url"]
+    )
+  end
+
+
+  error do |lane, exception|
+    slack(
+        message: "*#{app_name} #{version}* error: #{exception.message}",
+        success: false,
+        slack_url: ENV["slack_url"]
+    )
+  end
+
+end

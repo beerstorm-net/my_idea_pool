@@ -48,6 +48,8 @@ class _LoginSignupState extends State<LoginSignup> {
         builder: (context, state) {
           return Container(
               alignment: Alignment.center,
+              height: 600,
+              padding: EdgeInsets.only(top: 16.0, bottom: 16.0), //.all(8.0),
               child: (state is SignupPageState) ? SignupPage() : LoginPage());
         },
       ),

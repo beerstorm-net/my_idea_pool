@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_idea_pool/models/idea_repository.dart';
 
 import 'blocs/blocs.dart';
 import 'blocs/simple_bloc_observer.dart';
 import 'main_app.dart';
+import 'models/idea_repository.dart';
 import 'models/user_repository.dart';
 import 'shared/shared_preferences.dart';
 

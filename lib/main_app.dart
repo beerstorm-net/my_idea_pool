@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:my_idea_pool/pages/main_page.dart';
 
 import 'models/user_repository.dart';
+import 'pages/main_page.dart';
 
 class MainApp extends StatefulWidget {
   final UserRepository userRepository;

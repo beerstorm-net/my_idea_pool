@@ -27,3 +27,5 @@ String API_IDEA_ADD = "/ideas"; // POST
 String API_IDEA_DELETE = "/ideas/:id"; // DELETE
 String API_IDEA_UPDATE = "/ideas/:id"; // PUT
 String API_IDEAS = "/ideas"; // GET
+
+Duration REFRESH_TOKEN_TIMER = Duration(minutes: 3);

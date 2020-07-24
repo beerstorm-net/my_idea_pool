@@ -24,38 +24,41 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext buildContext) {
     return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'Sign Up',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            width: 20,
-            height: 20,
-          ),
-          Container(
-            height: 600,
-            width: 300,
-            child: _signupForm(buildContext),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("Already have an account? "),
-              InkWell(
-                child: Text(
-                  "Log in",
-                  style: TextStyle(color: Colors.green, fontSize: 14),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Sign Up',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              width: 20,
+              height: 20,
+            ),
+            Container(
+              height: 400,
+              width: 300,
+              child: _signupForm(buildContext),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("Already have an account? "),
+                InkWell(
+                  child: Text(
+                    "Log in",
+                    style: TextStyle(color: Colors.green, fontSize: 14),
+                  ),
+                  onTap: () {
+                    BlocProvider.of<AuthBloc>(buildContext)
+                        .add(LoginPageEvent());
+                  },
                 ),
-                onTap: () {
-                  BlocProvider.of<AuthBloc>(buildContext).add(LoginPageEvent());
-                },
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -92,11 +95,9 @@ class _SignupPageState extends State<SignupPage> {
                 maxLines: 1,
                 validators: [
                   FormBuilderValidators.required(),
-                  FormBuilderValidators.min(8,
-                      errorText: 'Password must be at least 8 chars long!'),
+                  FormBuilderValidators.min(8, errorText: 'min 8 chars long!'),
                   FormBuilderValidators.pattern(CommonUtils.passwordPattern(),
-                      errorText:
-                          'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number!'),
+                      errorText: 'min 1 uppercase, 1 lowercase, and 1 number!'),
                 ],
               ),
             ],
@@ -107,7 +108,7 @@ class _SignupPageState extends State<SignupPage> {
           height: 20,
         ),
         MaterialButton(
-          color: Theme.of(context).accentColor,
+          color: Colors.green,
           child: Text(
             'SIGN UP',
             style: TextStyle(color: Colors.white),

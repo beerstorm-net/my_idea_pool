@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:my_idea_pool/blocs/auth/auth_bloc.dart';
-import 'package:my_idea_pool/widgets/common_dialogs.dart';
 
+import '../blocs/auth/auth_bloc.dart';
 import '../models/app_idea.dart';
 import '../shared/common_utils.dart';
+import '../widgets/common_dialogs.dart';
 
 class IdeaEditorPage extends StatefulWidget {
   final Function add;
@@ -40,6 +40,8 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
         centerTitle: false,
       ),
       body: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(33.0),
         child: _ideaEditorForm(buildContext),
       ),
     );
@@ -68,6 +70,7 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
         FormBuilder(
           key: _ideaEditorFormKey,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               FormBuilderTextField(
                 attribute: "content",
@@ -124,14 +127,36 @@ class _IdeaEditorPageState extends State<IdeaEditorPage> {
                         DropdownMenuItem(value: num, child: Text("$num")))
                     .toList(),
               ),
-              FormBuilderTextField(
+              SizedBox(
+                width: 20,
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Avg. ',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    widget.appIdea != null
+                        ? widget.appIdea.average_score.toStringAsFixed(1)
+                        : _average.toStringAsFixed(1),
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+              Divider(
+                thickness: 2.0,
+              ),
+              /*FormBuilderTextField(
                 attribute: "average",
                 decoration: InputDecoration(labelText: "Avg."),
                 initialValue: widget.appIdea != null
                     ? widget.appIdea.average_score.toStringAsFixed(1)
                     : _average.toString(),
                 readOnly: true,
-              ),
+              ),*/
             ],
           ),
         ),

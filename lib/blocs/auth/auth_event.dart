@@ -36,7 +36,16 @@ class LoginEvent extends AuthEvent {
 
 class LogoutEvent extends AuthEvent {}
 
-class RefreshTokenEvent extends AuthEvent {}
+class RefreshTokenEvent extends AuthEvent {
+  final AppUser appUser;
+
+  const RefreshTokenEvent({this.appUser});
+  @override
+  List<Object> get props => [appUser];
+
+  @override
+  String toString() => 'RefreshTokenEvent { appUser: $appUser }';
+}
 
 class CurrentUserEvent extends AuthEvent {}
 

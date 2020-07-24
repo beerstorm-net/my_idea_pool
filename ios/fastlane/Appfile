@@ -1,0 +1,8 @@
+app_identifier("net.beerstorm.myIdeaPool") # The bundle identifier of your app
+apple_id("yilmaz@guleryuz.net") # Your Apple email address
+
+itc_team_id("959322") # App Store Connect Team ID
+team_id("UN5NS4WA58") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

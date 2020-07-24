@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_idea_pool/blocs/auth/auth_bloc.dart';
-import 'package:my_idea_pool/models/models.dart';
-import 'package:my_idea_pool/shared/common_utils.dart';
-import 'package:my_idea_pool/widgets/common_dialogs.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
+import '../blocs/auth/auth_bloc.dart';
+import '../models/models.dart';
+import '../shared/common_utils.dart';
+import '../widgets/common_dialogs.dart';
 import 'idea_pool_main.dart';
 import 'login_signup.dart';
 
@@ -22,6 +22,11 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   ProgressDialog _progressDialog;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext buildContext) {
@@ -62,7 +67,8 @@ class _MainPageState extends State<MainPage> {
             message: state.detail['message']));
       }
 
-      return Center(
+      return Container(
+        alignment: Alignment.center,
         child: RepositoryProvider(
           lazy: false,
           create: (buildContext) => widget.userRepository,

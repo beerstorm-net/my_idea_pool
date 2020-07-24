@@ -1,8 +1,9 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:my_idea_pool/shared/common_utils.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+
+import '../shared/common_utils.dart';
 
 appIconImage(
     {double width = 100, double heigth = 200, Color color = Colors.green}) {

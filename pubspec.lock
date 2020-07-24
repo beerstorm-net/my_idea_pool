@@ -280,6 +280,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
+  jiffy:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "26e767e783bd93d011490d0df5251085f8b934fc"
+      url: "git://github.com/beerstorm-net/jiffy.git"
+    source: git
+    version: "3.0.1"
   json_annotation:
     dependency: transitive
     description:

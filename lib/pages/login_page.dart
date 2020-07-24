@@ -16,39 +16,41 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext buildContext) {
     return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'Log In',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            width: 20,
-            height: 20,
-          ),
-          Container(
-            height: 600,
-            width: 300,
-            child: _loginForm(buildContext),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("Don't have an account? "),
-              InkWell(
-                child: Text(
-                  "Create an account",
-                  style: TextStyle(color: Colors.green, fontSize: 14),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Log In',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              width: 20,
+              height: 20,
+            ),
+            Container(
+              height: 400,
+              width: 300,
+              child: _loginForm(buildContext),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("Don't have an account? "),
+                InkWell(
+                  child: Text(
+                    "Create an account",
+                    style: TextStyle(color: Colors.green, fontSize: 14),
+                  ),
+                  onTap: () {
+                    BlocProvider.of<AuthBloc>(buildContext)
+                        .add(SignupPageEvent());
+                  },
                 ),
-                onTap: () {
-                  BlocProvider.of<AuthBloc>(buildContext)
-                      .add(SignupPageEvent());
-                },
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -77,11 +79,9 @@ class _LoginPageState extends State<LoginPage> {
                 maxLines: 1,
                 validators: [
                   FormBuilderValidators.required(),
-                  FormBuilderValidators.min(8,
-                      errorText: 'Password must be at least 8 chars long!'),
+                  FormBuilderValidators.min(8, errorText: 'min 8 chars long!'),
                   FormBuilderValidators.pattern(CommonUtils.passwordPattern(),
-                      errorText:
-                          'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number!'),
+                      errorText: 'min 1 uppercase, 1 lowercase, and 1 number!'),
                 ],
               ),
             ],
@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 20,
         ),
         MaterialButton(
-          color: Theme.of(context).accentColor,
+          color: Colors.green,
           child: Text(
             'LOG IN',
             style: TextStyle(color: Colors.white),

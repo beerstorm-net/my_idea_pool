@@ -96,13 +96,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Stream<AuthState> _mapRefreshTokenEventToState(
       RefreshTokenEvent event) async* {
-    AppUser appUser = _userRepository.sharedPrefUtils.prefsGetUser();
+    AppUser appUser =
+        event.appUser ?? _userRepository.sharedPrefUtils.prefsGetUser();
     if (appUser != null) {
       appUser = await _userRepository.refreshToken(appUser: appUser);
       if (appUser.token != null) {
         _userRepository.sharedPrefUtils.prefsSaveUser(appUser);
-        // NB! no need to yield a state again
-        //yield Authenticated(appUser, origin: ORIGIN.REFRESH_TOKEN);
+        // NB! do we need to yield a state again?
+        yield Authenticated(appUser, origin: ORIGIN.REFRESH_TOKEN);
       } else {
         yield Unauthenticated(
             detail: Map()
@@ -116,6 +117,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Stream<AuthState> _mapCurrentUserEventToState(CurrentUserEvent event) async* {
     AppUser appUser = _userRepository.sharedPrefUtils.prefsGetUser();
     if (appUser != null) {
+      if (CommonUtils.shouldRefreshToken(appUser.token_updated_at)) {
+        // force refresh when appStarted
+        add(RefreshTokenEvent(appUser: appUser));
+      }
+
       appUser = await _userRepository.currentUser(appUser: appUser);
       _userRepository.sharedPrefUtils.prefsSaveUser(appUser);
       yield Authenticated(appUser, origin: ORIGIN.CURRENT_USER);
@@ -127,7 +133,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AppUser appUser = _userRepository.sharedPrefUtils.prefsGetUser();
       CommonUtils.logger.d('current user: $appUser');
       if (appUser != null) {
-        yield Authenticated(appUser);
+        if (CommonUtils.shouldRefreshToken(appUser.token_updated_at)) {
+          // force refresh when appStarted
+          add(RefreshTokenEvent(appUser: appUser));
+        } else {
+          yield Authenticated(appUser);
+        }
       } else {
         yield Unauthenticated();
       }
@@ -137,7 +148,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Stream<AuthState> _mapWarnUserEventToState(WarnUserEvent event) async* {
-    // TODO implement this further if necessary
+    // NB! implement this further if necessary
     yield WarnUserState(event.actions, message: event.message);
   }
 }

@@ -6,6 +6,7 @@ import '../models/app_idea.dart';
 
 class IdeaEditorActions {
   BuildContext _context;
+  //UserRepository _userRepository;
   IdeaEditorActions({@required BuildContext context})
       : assert(context != null),
         _context = context;
